@@ -1,0 +1,23 @@
+# Node.js
+node_modules/
+.env
+*.log
+npm-debug.log*
+
+# React build
+frontend/build/
+
+# MacOS
+.DS_Store
+
+# IDEs and editors
+.vscode/
+.idea/
+
+# Optional: logs or temp files
+logs/
+*.tmp
+*.swp
+
+# Optional: OS specific
+Thumbs.db
