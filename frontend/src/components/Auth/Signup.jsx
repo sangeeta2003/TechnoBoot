@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import axios from 'axios';
 
 const Signup = () => {
   const navigate = useNavigate();
-  const { signup } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -60,11 +59,32 @@ const Signup = () => {
     
     if (validateForm()) {
       try {
-        await signup(formData.email, formData.password);
-        // Redirect to dashboard after successful signup
-        navigate('/dashboard', { replace: true });
+        const response = await axios.post('http://localhost:5000/api/auth/register', {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password
+        });
+
+        if (response.data.success && response.data.token) {
+          // Store token in localStorage
+          localStorage.setItem('token', response.data.token);
+          // Store user data if needed
+          localStorage.setItem('user', JSON.stringify(response.data.data));
+          // Redirect to dashboard
+          navigate('/dashboard', { replace: true });
+        }
       } catch (error) {
-        setError(error.message);
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          setError(error.response.data.error || 'Registration failed. Please try again.');
+        } else if (error.request) {
+          // The request was made but no response was received
+          setError('No response from server. Please try again.');
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          setError('An error occurred. Please try again.');
+        }
         console.error('Signup error:', error);
       }
     }

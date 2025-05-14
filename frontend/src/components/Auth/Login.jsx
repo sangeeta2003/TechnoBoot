@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import axios from 'axios';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -21,11 +20,21 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await login(formData.email, formData.password);
-      // Redirect to dashboard after successful login
-      navigate('/dashboard', { replace: true });
+      const response = await axios.post('http://localhost:5000/api/auth/login', {
+        email: formData.email,
+        password: formData.password
+      });
+
+      if (response.data.success && response.data.token) {
+        // Store token in localStorage
+        localStorage.setItem('token', response.data.token);
+        // Store user data if needed
+        localStorage.setItem('user', JSON.stringify(response.data.data));
+        // Redirect to dashboard
+        navigate('/dashboard', { replace: true });
+      }
     } catch (error) {
-      setError(error.message);
+      setError(error.response?.data?.error || 'Login failed. Please try again.');
       console.error('Login error:', error);
     }
   };

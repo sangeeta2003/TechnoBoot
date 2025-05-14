@@ -4,6 +4,8 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const errorHandler = require('./middleware/error');
+const dashboardRoutes = require('./routes/dashboardRoutes');
+const leadRoutes = require('./routes/leadRoutes');
 
 const app = express();
 
@@ -16,6 +18,9 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/leads', leadRoutes);
+
 
 // Error handling middleware
 app.use(errorHandler);
